@@ -5,7 +5,7 @@ namespace hugenet\Gateway;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Shirazsoft\Gateway\GatewayResolver
+ * @see \hugent\Gateway\GatewayResolver
  */
 class Gateway extends Facade
 {
