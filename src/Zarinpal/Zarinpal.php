@@ -253,8 +253,8 @@ class Zarinpal extends PortAbstract implements PortInterface
      */
     protected function userPayment()
     {
-        $this->authority = Request::get('Authority');
-        $status = Request::get('Status');
+        $this->authority = request()->get('Authority');
+        $status = request()->get('Status');
 
         if ($status == 'OK') {
             return true;
