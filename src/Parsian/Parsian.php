@@ -14,7 +14,7 @@ class Parsian extends PortAbstract implements PortInterface
      *
      * @var string
      */
-    protected $serverUrl        = 'https://pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl';
+    protected $serverUrl = 'https://pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl';
     protected $serverUrlConfirm = "https://pec.shaparak.ir/NewIPGServices/Confirm/ConfirmService.asmx?WSDL";
 
 
@@ -101,10 +101,10 @@ class Parsian extends PortAbstract implements PortInterface
         $this->newTransaction();
 
         $params = array(
-            'LoginAccount'   => $this->config->get('gateway.parsian.pin'),
-            'Amount'         => $this->amount . "",
-            'OrderId'        => $this->transactionId(),
-            'CallBackUrl'    => $this->getCallback(),
+            'LoginAccount' => $this->config->get('gateway.parsian.pin'),
+            'Amount' => $this->amount . "",
+            'OrderId' => $this->transactionId(),
+            'CallBackUrl' => $this->getCallback(),
             'AdditionalData' => ""
         );
 
@@ -155,7 +155,7 @@ class Parsian extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
-        if (!Request::has('Token') && !Request::has('status'))
+        if (!request()->has('Token') && !request()->has('status'))
             throw new ParsianErrorException('درخواست غیر معتبر', -1);
 
         $authority = Request::input('Token');
@@ -172,11 +172,11 @@ class Parsian extends PortAbstract implements PortInterface
 
         $params = array(
             'LoginAccount' => $this->config->get('gateway.parsian.pin'),
-            'Token'        => $authority,
+            'Token' => $authority,
         );
 
         try {
-            $soap   = new SoapClient($this->serverUrlConfirm);
+            $soap = new SoapClient($this->serverUrlConfirm);
             $result = $soap->ConfirmPayment([
                 "requestData" => $params
             ]);
