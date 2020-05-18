@@ -2,7 +2,6 @@
 
 namespace hugenet\Gateway\Zarinpal;
 
-use DateTime;
 use Illuminate\Http\Request;
 use hugenet\Gateway\Enum;
 use SoapClient;
@@ -12,91 +11,91 @@ use hugenet\Gateway\PortInterface;
 class Zarinpal extends PortAbstract implements PortInterface
 {
     /**
-     * Address of germany SOAP server
+     * Address of germany SOAP server.
      *
      * @var string
      */
     protected $germanyServer = 'https://de.zarinpal.com/pg/services/WebGate/wsdl';
 
     /**
-     * Address of iran SOAP server
+     * Address of iran SOAP server.
      *
      * @var string
      */
     protected $iranServer = 'https://ir.zarinpal.com/pg/services/WebGate/wsdl';
 
     /**
-     * Address of sandbox SOAP server
+     * Address of sandbox SOAP server.
      *
      * @var string
      */
     protected $sandboxServer = 'https://sandbox.zarinpal.com/pg/services/WebGate/wsdl';
 
     /**
-     * Address of main SOAP server
+     * Address of main SOAP server.
      *
      * @var string
      */
     protected $serverUrl;
 
     /**
-     * Payment Description
+     * Payment Description.
      *
      * @var string
      */
     protected $description;
 
     /**
-     * Payer Email Address
+     * Payer Email Address.
      *
      * @var string
      */
     protected $email;
 
     /**
-     * Payer Mobile Number
+     * Payer Mobile Number.
      *
      * @var string
      */
     protected $mobileNumber;
 
     /**
-     * Address of gate for redirect
+     * Address of gate for redirect.
      *
      * @var string
      */
     protected $gateUrl = 'https://www.zarinpal.com/pg/StartPay/';
 
     /**
-     * Address of sandbox gate for redirect
+     * Address of sandbox gate for redirect.
      *
      * @var string
      */
     protected $sandboxGateUrl = 'https://sandbox.zarinpal.com/pg/StartPay/';
 
     /**
-     * Address of zarin gate for redirect
+     * Address of zarin gate for redirect.
      *
      * @var string
      */
     protected $zarinGateUrl = 'https://www.zarinpal.com/pg/StartPay/$Authority/ZarinGate';
 
     /**
-     * Address of zarin gate for redirect To Saman Bank
+     * Address of zarin gate for redirect To Saman Bank.
      *
      * @var string
      */
     protected $zarinGateSepUrl = 'https://www.zarinpal.com/pg/StartPay/$Authority/Sep';
 
     /**
-     * Address of zarin gate for redirect To Melli Bank
+     * Address of zarin gate for redirect To Melli Bank.
      *
      * @var string
      */
     protected $zarinGateSadUrl = 'https://www.zarinpal.com/pg/StartPay/$Authority/Sad';
 
     /**
-     * return the type of zarinpal : normal , zarin-gate, zarin-gate-sad
+     * return the type of zarinpal : normal , zarin-gate, zarin-gate-sad.
      *
      * @var string
      */
@@ -108,7 +107,7 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Send pay request to server
+     * Send pay request to server.
      *
      * @return void
      *
@@ -146,8 +145,9 @@ class Zarinpal extends PortAbstract implements PortInterface
      */
     public function redirect()
     {
-        if (!$this->type)
+        if (!$this->type) {
             $this->type = $this->config->get('gateway.zarinpal.type');
+        }
 
         switch ($this->type) {
             case 'zarin-gate':
@@ -164,7 +164,7 @@ class Zarinpal extends PortAbstract implements PortInterface
 
             case 'normal':
             default:
-                return \Redirect::to($this->gateUrl . $this->refId);
+                return \Redirect::to($this->gateUrl.$this->refId);
                 break;
         }
     }
@@ -183,29 +183,33 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Sets callback url
+     * Sets callback url.
+     *
      * @param $url
      */
-    function setCallback($url)
+    public function setCallback($url)
     {
         $this->callbackUrl = $url;
+
         return $this;
     }
 
     /**
-     * Gets callback url
+     * Gets callback url.
+     *
      * @return string
      */
-    function getCallback()
+    public function getCallback()
     {
-        if (!$this->callbackUrl)
+        if (!$this->callbackUrl) {
             $this->callbackUrl = $this->config->get('gateway.zarinpal.callback-url');
+        }
 
         return $this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]);
     }
 
     /**
-     * Send pay request to server
+     * Send pay request to server.
      *
      * @return void
      *
@@ -227,7 +231,6 @@ class Zarinpal extends PortAbstract implements PortInterface
         try {
             $soap = new SoapClient($this->serverUrl, ['encoding' => 'UTF-8']);
             $response = $soap->PaymentRequest($fields);
-
         } catch (\SoapFault $e) {
             $this->transactionFailed();
             $this->newLog('SoapFault', $e->getMessage());
@@ -245,7 +248,7 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Check user payment with GET data
+     * Check user payment with GET data.
      *
      * @return bool
      *
@@ -253,8 +256,8 @@ class Zarinpal extends PortAbstract implements PortInterface
      */
     protected function userPayment()
     {
-        $this->authority = Request::get('Authority');
-        $status = Request::get('Status');
+        $this->authority = request()->get('Authority');
+        $status = request()->get('Status');
 
         if ($status == 'OK') {
             return true;
@@ -266,7 +269,7 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Verify user payment from zarinpal server
+     * Verify user payment from zarinpal server.
      *
      * @return bool
      *
@@ -274,7 +277,6 @@ class Zarinpal extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
-
         $fields = array(
             'MerchantID' => $this->config->get('gateway.zarinpal.merchant-id'),
             'Authority' => $this->refId,
@@ -284,7 +286,6 @@ class Zarinpal extends PortAbstract implements PortInterface
         try {
             $soap = new SoapClient($this->serverUrl, ['encoding' => 'UTF-8']);
             $response = $soap->PaymentVerification($fields);
-
         } catch (\SoapFault $e) {
             $this->transactionFailed();
             $this->newLog('SoapFault', $e->getMessage());
@@ -300,11 +301,12 @@ class Zarinpal extends PortAbstract implements PortInterface
         $this->trackingCode = $response->RefID;
         $this->transactionSucceed();
         $this->newLog($response->Status, Enum::TRANSACTION_SUCCEED_TEXT);
+
         return true;
     }
 
     /**
-     * Set server for soap transfers data
+     * Set server for soap transfers data.
      *
      * @return void
      */
@@ -328,11 +330,11 @@ class Zarinpal extends PortAbstract implements PortInterface
         }
     }
 
-
     /**
-     * Set Description
+     * Set Description.
      *
      * @param $description
+     *
      * @return void
      */
     public function setDescription($description)
@@ -341,9 +343,10 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Set Payer Email Address
+     * Set Payer Email Address.
      *
      * @param $email
+     *
      * @return void
      */
     public function setEmail($email)
@@ -352,9 +355,10 @@ class Zarinpal extends PortAbstract implements PortInterface
     }
 
     /**
-     * Set Payer Mobile Number
+     * Set Payer Mobile Number.
      *
      * @param $number
+     *
      * @return void
      */
     public function setMobileNumber($number)
