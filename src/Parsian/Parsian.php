@@ -158,8 +158,8 @@ class Parsian extends PortAbstract implements PortInterface
         if (!request()->has('Token') && !request()->has('status'))
             throw new ParsianErrorException('درخواست غیر معتبر', -1);
 
-        $authority = Request::input('Token');
-        $status = Request::input('status');
+        $authority = request()->input('Token');
+        $status = request()->input('status');
 
         if ($status != 0) {
             $errorMessage = ParsianResult::errorMessage($status);
