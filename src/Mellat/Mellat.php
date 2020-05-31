@@ -140,10 +140,10 @@ class Mellat extends PortAbstract implements PortInterface
 	 */
 	protected function userPayment()
 	{
-		$this->refId = Input::get('RefId');
-		$this->trackingCode = Input::get('SaleReferenceId');
-		$this->cardNumber = Input::get('CardHolderPan');
-		$payRequestResCode = Input::get('ResCode');
+		$this->refId = request()->get('RefId');
+		$this->trackingCode = request()->get('SaleReferenceId');
+		$this->cardNumber = request()->get('CardHolderPan');
+		$payRequestResCode = request()->get('ResCode');
 
 		if ($payRequestResCode == '0') {
 			return true;
