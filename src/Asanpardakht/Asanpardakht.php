@@ -141,7 +141,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
      */
     protected function userPayment()
     {
-        $ReturningParams = Input::get('ReturningParams');
+        $ReturningParams = request()->get('ReturningParams');
         $ReturningParams = $this->decrypt($ReturningParams);
 
         $paramsArray = explode(",", $ReturningParams);

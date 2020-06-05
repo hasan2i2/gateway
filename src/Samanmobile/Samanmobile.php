@@ -97,10 +97,10 @@ class Samanmobile extends PortAbstract implements PortInterface
      */
     protected function userPayment()
     {
-        $this->refId = Input::get('RefNum');
-        $this->trackingCode = Input::get('ResNum');
-        $payRequestRes = Input::get('State');
-        $payRequestResCode = Input::get('StateCode');
+        $this->refId = request()->get('RefNum');
+        $this->trackingCode = request()->get('ResNum');
+        $payRequestRes = request()->get('State');
+        $payRequestResCode = request()->get('StateCode');
 
         if ($payRequestRes == 'OK') {
             return true;
@@ -144,7 +144,7 @@ class Samanmobile extends PortAbstract implements PortInterface
         if ($response != $this->amount) {
 
             //Reverse Transaction
-            if($response>0){
+            if ($response > 0) {
                 try {
                     $soap = new SoapClient($this->serverUrl);
                     $response = $soap->ReverseTransaction($fields["RefNum"], $fields["merchantID"], $fields["password"], $response);
