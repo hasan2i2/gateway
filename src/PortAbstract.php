@@ -224,7 +224,7 @@ abstract class PortAbstract
             'price' => $this->amount,
             'status' => Enum::TRANSACTION_INIT,
             'ip' => Request::getClientIp(),
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->check() ? auth()->user()->id : null,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]) ? $uid : null;
