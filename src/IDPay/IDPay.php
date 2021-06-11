@@ -156,7 +156,6 @@ class IDPay extends PortAbstract implements PortInterface
             }
         } else {
             $this->transactionFailed();
-            dd($response);
             $this->newLog($response['error_code'], IDPayException::$errors[$response['error_code']]);
             throw new IDPayException($response['error_code']);
         }
