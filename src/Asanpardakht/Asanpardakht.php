@@ -88,7 +88,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
      *
      * @return void
      *
-     * @throws AsanpardakhtException
+     * @throws IDPayException
      */
     protected function sendPayRequest()
     {
@@ -124,8 +124,8 @@ class Asanpardakht extends PortAbstract implements PortInterface
         $responseCode = explode(",", $response)[0];
         if ($responseCode != '0') {
             $this->transactionFailed();
-            $this->newLog($response, AsanpardakhtException::getMessageByCode($response));
-            throw new AsanpardakhtException($response);
+            $this->newLog($response, IDPayException::getMessageByCode($response));
+            throw new IDPayException($response);
         }
         $this->refId = substr($response, 2);
         $this->transactionSetRefId();
@@ -137,7 +137,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
      *
      * @return bool
      *
-     * @throws AsanpardakhtException
+     * @throws IDPayException
      */
     protected function userPayment()
     {
@@ -165,8 +165,8 @@ class Asanpardakht extends PortAbstract implements PortInterface
         }
 
         $this->transactionFailed();
-        $this->newLog($ResCode, $ResMessage . " - " . AsanpardakhtException::getMessageByCode($ResCode));
-        throw new AsanpardakhtException($ResCode);
+        $this->newLog($ResCode, $ResMessage . " - " . IDPayException::getMessageByCode($ResCode));
+        throw new IDPayException($ResCode);
     }
 
 
@@ -175,7 +175,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
      *
      * @return bool
      *
-     * @throws AsanpardakhtException
+     * @throws IDPayException
      * @throws SoapFault
      */
     protected function verifyAndSettlePayment()
@@ -205,8 +205,8 @@ class Asanpardakht extends PortAbstract implements PortInterface
 
         if ($response != '500') {
             $this->transactionFailed();
-            $this->newLog($response, AsanpardakhtException::getMessageByCode($response));
-            throw new AsanpardakhtException($response);
+            $this->newLog($response, IDPayException::getMessageByCode($response));
+            throw new IDPayException($response);
         }
 
 
@@ -216,7 +216,7 @@ class Asanpardakht extends PortAbstract implements PortInterface
             $response = $response->RequestReconciliationResult;
 
             if ($response != '600')
-                $this->newLog($response, AsanpardakhtException::getMessageByCode($response));
+                $this->newLog($response, IDPayException::getMessageByCode($response));
 
         } catch (\SoapFault $e) {
             //If fail, shaparak automatically do it in next 12 houres.
