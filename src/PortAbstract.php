@@ -106,6 +106,11 @@ abstract class PortAbstract
         return $this->db->table($this->config->get('gateway.table') . '_logs');
     }
 
+    public function setFactorNumber($id)
+    {
+        return $this;
+    }
+
     /**
      * Get port id, $this->port
      *
