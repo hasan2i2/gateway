@@ -2,7 +2,7 @@
 
 namespace hugenet\Gateway\IDPay;
 
-use hugenet\Gateway\Asanpardakht\IDPayException;
+use hugenet\Gateway\IDPay\IDPayException;
 use hugenet\Gateway\Enum;
 use hugenet\Gateway\PortAbstract;
 use hugenet\Gateway\PortInterface;
@@ -121,10 +121,9 @@ class IDPay extends PortAbstract implements PortInterface
     protected function sendPayRequest()
     {
         $this->newTransaction();
-        //dd($this->getCallback());
+        $api = $this->config->get('gateway.idpay.api');
+        $sandbox = $this->config->get('gateway.idpay.sandbox');
         $fields = [
-            'X-API-KEY' => $this->config->get('gateway.idpay.api'),
-            'X-SANDBOX' => $this->config->get('gateway.idpay.sandbox'),
             'amount' => $this->amount,
             'callback' => $this->getCallback(),
             'phone' => $this->config->get('gateway.idpay.phone')
@@ -141,8 +140,8 @@ class IDPay extends PortAbstract implements PortInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type:application/json',
-            'X-SANDBOX: true',
-            'X-API-KEY: 6a7f99eb-7c20-4412-a972-6dfb7cd253a4'
+            'X-SANDBOX: ' . $sandbox,
+            'X-API-KEY: ' . $api
         ));
         $response = curl_exec($ch);
         $response = json_decode($response, true);
@@ -194,18 +193,18 @@ class IDPay extends PortAbstract implements PortInterface
      */
     protected function verifyPayment()
     {
+        $api = $this->config->get('gateway.idpay.api');
+        $sandbox = $this->config->get('gateway.idpay.sandbox');
         $fields = [
-            'X-API-KEY' => $this->config->get('gateway.payir.api'),
-            'X-SANDBOX' => $this->config->get('gateway.idpay.sandbox'),
             'id' => $this->refId(),
-            'order_id'=>$this->trackingCode
+            'order_id' => $this->trackingCode
         ];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->serverVerifyUrl);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type:application/json',
-            'X-SANDBOX: true',
-            'X-API-KEY: 6a7f99eb-7c20-4412-a972-6dfb7cd253a4'
+            'X-SANDBOX: ' . $sandbox,
+            'X-API-KEY: ' . $api
         ));
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));

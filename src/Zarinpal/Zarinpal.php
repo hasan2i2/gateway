@@ -60,6 +60,11 @@ class Zarinpal extends PortAbstract implements PortInterface
      */
     protected $mobileNumber;
 
+    public function setFactorNumber($id)
+    {
+        return $this;
+    }
+
     /**
      * Address of gate for redirect
      *
