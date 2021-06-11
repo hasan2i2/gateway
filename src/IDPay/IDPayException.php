@@ -1,6 +1,6 @@
 <?php
 
-namespace hugenet\Gateway\Asanpardakht;
+namespace hugenet\Gateway\IDPay;
 
 use hugenet\Gateway\Exceptions\BankException;
 

@@ -37,7 +37,7 @@ class IDPay extends PortAbstract implements PortInterface
      */
     public function set($amount)
     {
-        $this->amount = $amount * 10;
+        $this->amount = $amount;
         return $this;
     }
 
@@ -107,7 +107,8 @@ class IDPay extends PortAbstract implements PortInterface
     {
         if (!$this->callbackUrl)
             $this->callbackUrl = $this->config->get('gateway.payir.callback-url');
-        return urlencode($this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]));
+        return ($this->makeCallback($this->callbackUrl, ['transaction_id' => $this->transactionId()]));
+
     }
 
     /**
@@ -120,11 +121,12 @@ class IDPay extends PortAbstract implements PortInterface
     protected function sendPayRequest()
     {
         $this->newTransaction();
+        //dd($this->getCallback());
         $fields = [
             'X-API-KEY' => $this->config->get('gateway.idpay.api'),
             'X-SANDBOX' => $this->config->get('gateway.idpay.sandbox'),
             'amount' => $this->amount,
-            'redirect' => $this->getCallback(),
+            'callback' => $this->getCallback(),
             'phone' => $this->config->get('gateway.idpay.phone')
         ];
 
@@ -132,15 +134,21 @@ class IDPay extends PortAbstract implements PortInterface
             $fields['order_id'] = $this->factorNumber;
 
         $ch = curl_init();
+
         curl_setopt($ch, CURLOPT_URL, $this->serverUrl);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type:application/json',
+            'X-SANDBOX: true',
+            'X-API-KEY: 6a7f99eb-7c20-4412-a972-6dfb7cd253a4'
+        ));
         $response = curl_exec($ch);
         $response = json_decode($response, true);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        if ($httpcode == '200') {
+        if ($httpcode == '201') {
             if (isset($response['id']) && isset($response['link'])) {
                 $this->refId = $response['id'];
                 $this->transactionSetRefId();
@@ -149,6 +157,7 @@ class IDPay extends PortAbstract implements PortInterface
             }
         } else {
             $this->transactionFailed();
+            dd($response);
             $this->newLog($response['error_code'], IDPayException::$errors[$response['error_code']]);
             throw new IDPayException($response['error_code']);
         }
@@ -188,16 +197,24 @@ class IDPay extends PortAbstract implements PortInterface
         $fields = [
             'X-API-KEY' => $this->config->get('gateway.payir.api'),
             'X-SANDBOX' => $this->config->get('gateway.idpay.sandbox'),
-            'transId' => $this->refId(),
+            'id' => $this->refId(),
+            'order_id'=>$this->trackingCode
         ];
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $this->serverVerifyUrl);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type:application/json',
+            'X-SANDBOX: true',
+            'X-API-KEY: 6a7f99eb-7c20-4412-a972-6dfb7cd253a4'
+        ));
+
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
         $response = json_decode($response, true);
         curl_close($ch);
+
         if ($response['status'] == 100) {
             $this->transactionSucceed();
             $this->newLog(100, Enum::TRANSACTION_SUCCEED_TEXT);

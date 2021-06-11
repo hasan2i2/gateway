@@ -146,6 +146,7 @@ class GatewayResolver
      */
     function make($port)
     {
+        //dd($port);
         if ($port instanceof Mellat) {
             $name = Enum::MELLAT;
         } elseif ($port instanceof Parsian) {
@@ -170,8 +171,11 @@ class GatewayResolver
             $name = Enum::SAMANMOBILE;
         }  elseif ($port instanceof IDPay) {
             $name = Enum::IDPAY;
-        } elseif (in_array(strtoupper($port), $this->getSupportedPorts())) {
-            $port = ucfirst(strtolower($port));
+        }elseif($port=='IDPAY'){
+            $port=new IDPAY();
+            $name="IDPAY";
+        } elseif (in_array(($port), $this->getSupportedPorts())) {
+            $port = ucfirst(($port));
             $name = strtoupper($port);
             $class = __NAMESPACE__ . '\\' . $port . '\\' . $port;
             $port = new $class;
