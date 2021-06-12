@@ -177,11 +177,8 @@ class GatewayResolver
         } elseif ($port == 'ZARINPAL') {
             $port = new Zarinpal();
             $name = "ZARINPAL";
-        } elseif ($port == 'MELLI') {
-            $port = new Sadad();
-            $name = "SADAD";
-        } elseif (in_array(($port), $this->getSupportedPorts())) {
-            $port = ucfirst(($port));
+        } elseif (in_array(strtoupper($port), $this->getSupportedPorts())) {
+            $port = ucfirst(strtolower($port));
             $name = strtoupper($port);
             $class = __NAMESPACE__ . '\\' . $port . '\\' . $port;
             $port = new $class;
