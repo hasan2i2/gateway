@@ -169,11 +169,17 @@ class GatewayResolver
             $name = Enum::SADERAT;
         } elseif ($port instanceof Samanmobile) {
             $name = Enum::SAMANMOBILE;
-        }  elseif ($port instanceof IDPay) {
+        } elseif ($port instanceof IDPay) {
             $name = Enum::IDPAY;
-        }elseif($port=='IDPAY'){
-            $port=new IDPAY();
-            $name="IDPAY";
+        } elseif ($port == 'IDPAY') {
+            $port = new IDPAY();
+            $name = "IDPAY";
+        } elseif ($port == 'ZARINPAL') {
+            $port = new Zarinpal();
+            $name = "ZARINPAL";
+        } elseif ($port == 'MELLI') {
+            $port = new Sadad();
+            $name = "SADAD";
         } elseif (in_array(($port), $this->getSupportedPorts())) {
             $port = ucfirst(($port));
             $name = strtoupper($port);
